@@ -23,8 +23,7 @@ import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ClinicServiceTests {
 
@@ -118,6 +117,8 @@ public class ClinicServiceTests {
 		when(vetRepository.findAll()).thenReturn(Collections.emptyList());
 
 		clinicService.visitOwnerPets(owner);
+
+		verify(visitRepository, times(0)).save(any(Visit.class));
 
 	}
 

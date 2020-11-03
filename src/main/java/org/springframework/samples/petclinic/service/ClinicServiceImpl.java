@@ -228,7 +228,6 @@ public class ClinicServiceImpl implements ClinicService {
                 int age = Years.yearsBetween(new DateTime(pet.getBirthDate()), today).getYears();
                 int daysFromLastVisit = Days.daysBetween(new DateTime(last.get().getDate()), today).getDays();
                 if ((age > 3 && daysFromLastVisit > 364) || (age <= 3 && daysFromLastVisit > 182)) {
-					System.out.println('z');
                     visitPetIfPossible(vets, notVisited, pet);
                 }
             } else {
@@ -236,7 +235,6 @@ public class ClinicServiceImpl implements ClinicService {
             }
         }
         if (notVisited.size() > 0) {
-			System.out.println("here");
             throw new VisitException(notVisited);
         }
     }
