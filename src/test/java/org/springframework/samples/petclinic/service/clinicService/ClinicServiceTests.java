@@ -54,40 +54,83 @@ public class ClinicServiceTests {
 	}
 
 	@Test
-	public void visitOwnerPetsTest() {
+	public void visitOwnerPetsTest1() {
 		Owner owner = new Owner();
 
 		Pet pet1 = mock(Pet.class);
-		Pet pet2 = mock(Pet.class);
-		Pet pet3 = mock(Pet.class);
-		Pet pet4 = mock(Pet.class);
-		Pet pet5 = mock(Pet.class);
 
 		when(pet1.getBirthDate()).thenReturn(Date.from(LocalDate.of(2020, 01, 01).atStartOfDay(ZoneId.systemDefault()).toInstant()));
-		when(pet2.getBirthDate()).thenReturn(Date.from(LocalDate.of(2020, 01, 01).atStartOfDay(ZoneId.systemDefault()).toInstant()));
-		when(pet3.getBirthDate()).thenReturn(Date.from(LocalDate.of(2015, 01, 01).atStartOfDay(ZoneId.systemDefault()).toInstant()));
-		when(pet4.getBirthDate()).thenReturn(Date.from(LocalDate.of(2015, 01, 01).atStartOfDay(ZoneId.systemDefault()).toInstant()));
-		when(pet5.getBirthDate()).thenReturn(Date.from(LocalDate.of(2015, 01, 01).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
 		Visit visit1 = mock(Visit.class);
-		Visit visit2 = mock(Visit.class);
-		Visit visit3 = mock(Visit.class);
-		Visit visit4 = mock(Visit.class);
 
 		when(visit1.getDate()).thenReturn(Date.from(LocalDate.of(2020, 10, 27).atStartOfDay(ZoneId.systemDefault()).toInstant()));
-		when(visit2.getDate()).thenReturn(Date.from(LocalDate.of(2020, 02, 27).atStartOfDay(ZoneId.systemDefault()).toInstant()));
-		when(visit3.getDate()).thenReturn(Date.from(LocalDate.of(2019, 02, 27).atStartOfDay(ZoneId.systemDefault()).toInstant()));
-		when(visit4.getDate()).thenReturn(Date.from(LocalDate.of(2020, 10, 27).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
 
 		when(pet1.getLastVisit()).thenReturn(java.util.Optional.of(visit1));
-		when(pet2.getLastVisit()).thenReturn(java.util.Optional.of(visit2));
-		when(pet3.getLastVisit()).thenReturn(java.util.Optional.of(visit3));
-		when(pet4.getLastVisit()).thenReturn(java.util.Optional.of(visit4));
-
-		when(pet5.getLastVisit()).thenReturn(Optional.empty());
 
 		when(petRepository.findByOwner(owner)).thenReturn(
-			new ArrayList<>(Arrays.asList(pet1, pet2, pet3, pet4, pet5))
+			new ArrayList<>(Arrays.asList(pet1))
+		);
+
+		Vet vet = mock(Vet.class);
+		when(vet.canCurePetTye(any())).thenReturn(true);
+
+
+		when(vetRepository.findAll()).thenReturn(new ArrayList<>(Arrays.asList(vet)));
+
+		clinicService.visitOwnerPets(owner);
+
+		verify(visitRepository, times(0)).save(any(Visit.class));
+
+	}
+
+	@Test
+	public void visitOwnerPetsTest2() {
+		Owner owner = new Owner();
+
+		Pet pet2 = mock(Pet.class);
+
+		when(pet2.getBirthDate()).thenReturn(Date.from(LocalDate.of(2020, 01, 01).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+
+		Visit visit2 = mock(Visit.class);
+
+		when(visit2.getDate()).thenReturn(Date.from(LocalDate.of(2020, 02, 27).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+		when(pet2.getLastVisit()).thenReturn(java.util.Optional.of(visit2));
+
+		when(petRepository.findByOwner(owner)).thenReturn(
+			new ArrayList<>(Arrays.asList(pet2))
+		);
+
+		Vet vet = mock(Vet.class);
+		when(vet.canCurePetTye(any())).thenReturn(true);
+
+		when(vetRepository.findAll()).thenReturn(new ArrayList<>(Arrays.asList(vet)));
+
+		clinicService.visitOwnerPets(owner);
+
+		verify(visitRepository, times(1)).save(any(Visit.class));
+
+	}
+
+	@Test
+	public void visitOwnerPetsTest3() {
+		Owner owner = new Owner();
+
+		Pet pet3 = mock(Pet.class);
+
+		when(pet3.getBirthDate()).thenReturn(Date.from(LocalDate.of(2015, 01, 01).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+		Visit visit3 = mock(Visit.class);
+
+		when(visit3.getDate()).thenReturn(Date.from(LocalDate.of(2019, 02, 27).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+		when(pet3.getLastVisit()).thenReturn(java.util.Optional.of(visit3));
+
+
+		when(petRepository.findByOwner(owner)).thenReturn(
+			new ArrayList<>(Arrays.asList(pet3))
 		);
 
 
@@ -97,6 +140,38 @@ public class ClinicServiceTests {
 		when(vetRepository.findAll()).thenReturn(new ArrayList<>(Arrays.asList(vet)));
 
 		clinicService.visitOwnerPets(owner);
+
+		verify(visitRepository, times(1)).save(any(Visit.class));
+
+	}
+
+	@Test
+	public void visitOwnerPetsTest4() {
+		Owner owner = new Owner();
+
+		Pet pet4 = mock(Pet.class);
+		when(pet4.getBirthDate()).thenReturn(Date.from(LocalDate.of(2015, 01, 01).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+		Visit visit4 = mock(Visit.class);
+
+		when(visit4.getDate()).thenReturn(Date.from(LocalDate.of(2020, 10, 27).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+		when(pet4.getLastVisit()).thenReturn(java.util.Optional.of(visit4));
+
+
+		when(petRepository.findByOwner(owner)).thenReturn(
+			new ArrayList<>(Arrays.asList(pet4))
+		);
+
+
+		Vet vet = mock(Vet.class);
+		when(vet.canCurePetTye(any())).thenReturn(true);
+
+		when(vetRepository.findAll()).thenReturn(new ArrayList<>(Arrays.asList(vet)));
+
+		clinicService.visitOwnerPets(owner);
+
+		verify(visitRepository, times(0)).save(any(Visit.class));
 
 	}
 
