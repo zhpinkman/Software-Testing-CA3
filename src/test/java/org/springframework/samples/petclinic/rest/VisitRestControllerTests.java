@@ -16,6 +16,7 @@
 
 package org.springframework.samples.petclinic.rest;
 
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -221,6 +223,34 @@ public class VisitRestControllerTests {
     		.content(newVisitAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))
         	.andExpect(status().isBadRequest());
      }
+
+     @Test
+	 @WithMockUser(roles = "OWNER_ADMIN")
+	 public void testUpdateVisitErrorNotFound() throws Exception {
+    	Visit newVisit = visits.get(0);
+    	ObjectMapper mapper = new ObjectMapper();
+    	String newVisitAsJSON = mapper.writeValueAsString(newVisit);
+		 given(this.clinicService.findVisitById(20)).willReturn(null);
+    	this.mockMvc.perform(put("/api/visits/20")
+			.content(newVisitAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))
+			.andExpect(status().isNotFound());
+	 }
+
+	@Test
+	@WithMockUser(roles = "OWNER_ADMIN")
+	public void testUpdateVisitBadRequest() throws Exception {
+		Visit newVisit = visits.get(0);
+		newVisit.setPet(null);
+		System.out.println(newVisit);
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+		String newVisitAsJSON = mapper.writeValueAsString(newVisit);
+		given(this.clinicService.findVisitById(2)).willReturn(visits.get(0));
+		this.mockMvc.perform(put("/api/visits/2")
+			.content(newVisitAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))
+			.andExpect(status().isBadRequest());
+	}
+
 
     @Test
     @WithMockUser(roles="OWNER_ADMIN")
