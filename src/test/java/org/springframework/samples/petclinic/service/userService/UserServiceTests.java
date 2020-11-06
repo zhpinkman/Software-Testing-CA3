@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.model.*;
@@ -58,4 +59,23 @@ public class UserServiceTests {
 		UserService.saveUser(user1);
 		verify(userRepository, times(0));
 	}
+
+	@Test
+	public void NotStartsWithRole() throws Exception {
+		User user3 = mock(User.class);
+
+		Role new_role = new Role();
+		new_role.setName("Akbar");
+
+
+		HashSet<Role> roles = new HashSet<>();
+		roles.add(new_role);
+		when(user3.getRoles()).thenReturn(roles);
+
+
+		UserService.saveUser(user3);
+		verify(userRepository, times(1));
+		Assert.assertEquals(new_role.getName(), "ROLE_Akbar");
+	}
+
 }
