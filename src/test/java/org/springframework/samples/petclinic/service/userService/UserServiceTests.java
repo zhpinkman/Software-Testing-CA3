@@ -12,6 +12,7 @@ import org.springframework.samples.petclinic.model.*;
 import org.springframework.samples.petclinic.repository.*;
 import org.springframework.samples.petclinic.service.ClinicServiceImpl;
 import org.springframework.samples.petclinic.service.UserServiceImpl;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,19 +43,18 @@ public class UserServiceTests {
 		Assert.assertNotNull(UserService);
 	}
 
-//	@Test(expected = Exception.class)
-//	public void NullRoleTest() throws Exception {
-//		User user1 = mock(User.class);
-//		when(user1.getRoles()).thenReturn(null);
-//		UserService.saveUser(user1);
-//		verify(userRepository, times(0));
-//	}
+	@Test(expected = Exception.class)
+	public void NullRoleTest() throws Exception {
+		User user1 = mock(User.class);
+		when(user1.getRoles()).thenReturn(null);
+		UserService.saveUser(user1);
+		verify(userRepository, times(0));
+	}
 
 	@Test(expected = Exception.class)
-	public void EmptyRoleTest(){
-		User user1 = mock(User.class);
-		when(user1.getRoles()).thenReturn(new HashSet<>());
-		when(user1.getRoles().isEmpty()).thenReturn(Boolean.FALSE);
+	public void EmptyRoleTest() throws Exception {
+		User user1 = new User();
+//		user1.addRole("Owner_admin");
 		UserService.saveUser(user1);
 		verify(userRepository, times(0));
 	}
