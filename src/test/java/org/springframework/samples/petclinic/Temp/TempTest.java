@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Pet;
@@ -39,7 +40,7 @@ public class TempTest {
 		Assert.assertEquals(minus, 5);
 	}
 
-	@Test
+	@Ignore
 	public void tempTest() throws JsonProcessingException {
 
 		PetType petType = new PetType();

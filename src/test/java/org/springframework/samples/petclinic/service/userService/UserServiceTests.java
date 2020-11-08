@@ -32,7 +32,7 @@ public class UserServiceTests {
 	private UserRepository userRepository;
 
 	@InjectMocks
-	private UserServiceImpl UserService;
+	private UserServiceImpl userService;
 
 	@Before
 	public void setup() {
@@ -41,41 +41,44 @@ public class UserServiceTests {
 
 	@Test
 	public void constructorTest() {
-		Assert.assertNotNull(UserService);
+		Assert.assertNotNull(userService);
 	}
 
 	@Test(expected = Exception.class)
 	public void NullRoleTest() throws Exception {
 		User user1 = mock(User.class);
 		when(user1.getRoles()).thenReturn(null);
-		UserService.saveUser(user1);
-		verify(userRepository, times(0));
+		userService.saveUser(user1);
+		verify(userRepository, times(0)).save(user1);
+		verify(user1, times(1)).getRoles();
 	}
 
 	@Test(expected = Exception.class)
 	public void EmptyRoleTest() throws Exception {
-		User user1 = new User();
-//		user1.addRole("Owner_admin");
-		UserService.saveUser(user1);
-		verify(userRepository, times(0));
+		User user1 = mock(User.class);
+		HashSet<Role> roles = new HashSet<>();
+		when(user1.getRoles()).thenReturn(roles);
+		userService.saveUser(user1);
+		verify(userRepository, times(0)).save(user1);
+		verify(user1, times(1)).getRoles();
 	}
 
 	@Test
-	public void NotStartsWithRole() throws Exception {
-		User user3 = mock(User.class);
-
-		Role new_role = new Role();
-		new_role.setName("Akbar");
-
-
+	public void SuccessSaveUserTest() throws Exception {
+		User tempUser = mock(User.class);
 		HashSet<Role> roles = new HashSet<>();
-		roles.add(new_role);
-		when(user3.getRoles()).thenReturn(roles);
-
-
-		UserService.saveUser(user3);
-		verify(userRepository, times(1));
-		Assert.assertEquals(new_role.getName(), "ROLE_Akbar");
+		Role role1 = new Role();
+		role1.setName("Zhivar");
+		role1.setUser(tempUser);
+		roles.add(role1);
+		Role role2 = new Role();
+		role2.setName("ROLE_zhivar");
+		role2.setUser(null);
+		roles.add(role2);
+		when(tempUser.getRoles()).thenReturn(roles);
+		userService.saveUser(tempUser);
+		verify(userRepository, times(1)).save(tempUser);
 	}
+
 
 }
