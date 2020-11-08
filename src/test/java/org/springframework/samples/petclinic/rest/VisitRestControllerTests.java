@@ -18,6 +18,7 @@ package org.springframework.samples.petclinic.rest;
 
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -32,6 +33,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -39,7 +41,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.PetType;
@@ -54,6 +58,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.validation.BindingResult;
 
 /**
  * Test class for {@link VisitRestController}
@@ -237,19 +242,38 @@ public class VisitRestControllerTests {
 			.andExpect(status().isNotFound());
 	 }
 
-	@Ignore
+	@Test
 	@WithMockUser(roles = "OWNER_ADMIN")
-	public void testUpdateVisitBadRequest() throws Exception {
+	public void updateVisitBadRequestHasErrors() throws Exception {
+		Visit newVisit = visits.get(0);
+		BindingResult bindingResult = mock(BindingResult.class);
+		given(this.clinicService.findVisitById(2)).willReturn(visits.get(0));
+		given(bindingResult.hasErrors()).willReturn(true);
+		ResponseEntity<Visit> visitResponseEntity = visitRestController.updateVisit(2, newVisit, bindingResult);
+		Assert.assertEquals(visitResponseEntity.getStatusCode(), HttpStatus.BAD_REQUEST);
+	}
+
+	@Test
+	@WithMockUser(roles = "OWNER_ADMIN")
+	public void updateVisitBadRequestNullVisit() throws Exception {
+		Visit newVisit = null;
+		BindingResult bindingResult = mock(BindingResult.class);
+		given(this.clinicService.findVisitById(2)).willReturn(visits.get(0));
+		given(bindingResult.hasErrors()).willReturn(false);
+		ResponseEntity<Visit> visitResponseEntity = visitRestController.updateVisit(2, newVisit, bindingResult);
+		Assert.assertEquals(visitResponseEntity.getStatusCode(), HttpStatus.BAD_REQUEST);
+	}
+
+	@Test
+	@WithMockUser(roles = "OWNER_ADMIN")
+	public void updateVisitBadRequestNullPet() throws Exception {
 		Visit newVisit = visits.get(0);
 		newVisit.setPet(null);
-		System.out.println(newVisit);
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		String newVisitAsJSON = mapper.writeValueAsString(newVisit);
+		BindingResult bindingResult = mock(BindingResult.class);
 		given(this.clinicService.findVisitById(2)).willReturn(visits.get(0));
-		this.mockMvc.perform(put("/api/visits/2")
-			.content(newVisitAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))
-			.andExpect(status().isBadRequest());
+		given(bindingResult.hasErrors()).willReturn(false);
+		ResponseEntity<Visit> visitResponseEntity = visitRestController.updateVisit(2, newVisit, bindingResult);
+		Assert.assertEquals(visitResponseEntity.getStatusCode(), HttpStatus.BAD_REQUEST);
 	}
 
 
